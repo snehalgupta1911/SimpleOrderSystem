@@ -1,0 +1,5 @@
+Invoice:
+Apple: 100 2
+Banana: 50 5
+Orange: 80 3
+Total bill (including 18% tax): 814
