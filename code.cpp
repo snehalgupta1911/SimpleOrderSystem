@@ -1,84 +1,111 @@
 #include <iostream>
-#include <fstream> // For file operations
+#include <fstream>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <sstream>
 using namespace std;
 
-class item{
+class item {
 public:
     string name;
     int price;
     int quantity;
-    item(string n, int p, int q): name(n), price(p), quantity(q) {
-    }
+
+    item(string n, int p, int q)
+        : name(n), price(p), quantity(q) {}
 };
 
-
-class list{
+class list {
 public:
     vector<item> items;
-    void add(item ITEM){
-        items.push_back(ITEM);
-    }
-    void remove(item ITEM){
-        if(items.empty()){
-            cout << "List is empty" << endl;
-            return;
+
+    // Read items from a text file
+    void load_from_file(istream& in) {
+    string line;
+
+    cout << "Reading file...\n";
+
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+
+        // Remove UTF-8 BOM if present
+        if (line.size() >= 3 &&
+            (unsigned char)line[0] == 0xEF &&
+            (unsigned char)line[1] == 0xBB &&
+            (unsigned char)line[2] == 0xBF) {
+            line = line.substr(3);
         }
-        for(int i=0;i<items.size();i++){
-            if(items[i].name==ITEM.name){
-                items.erase(items.begin()+i);
-                return;
+
+        string name;
+        int price, quantity;
+
+        stringstream ss(line);
+        ss >> name >> price >> quantity;
+
+        if (ss.fail()) {
+            cout << "Skipped line: [" << line << "]\n";
+            continue;
         }
-    }
-    cout << "Item not found" << endl;
+
+        items.emplace_back(name, price, quantity);
+        cout << "Read: " << name << " " << price << " " << quantity << endl;
     }
 
+    cout << "Finished reading. Items loaded: " << items.size() << endl;
+}
 
 };
 
-class billing_system{
-    private:
-        list item_list;
-    public:
-        int percent_tax;
-        void bill_total(list item_list,ostream& out){
-            int sum=0;
-            for (auto item : item_list.items){
-                sum+=item.price*item.quantity;
-            }
-            sum=sum + (sum*percent_tax)/100;
-            out << "Total bill (including " << percent_tax << "% tax): " << sum << endl;
-        }
+class billing_system {
+public:
+    int percent_tax;
 
-        void invoice(list item_list,ostream& out){
-            out << "Invoice:" << endl;
-            for (auto item : item_list.items){
-                out << item.name << ": " << item.price << " "<< item.quantity<< endl;
-            }
-            bill_total(item_list, out);
+    void bill_total(const list& item_list, ostream& out) {
+        int sum = 0;
+        for (const auto& it : item_list.items) {
+            sum += it.price * it.quantity;
         }
+        sum += (sum * percent_tax) / 100;
 
+        out << "Total bill (including "
+            << percent_tax << "% tax): "
+            << sum << endl;
+    }
+
+    void invoice(const list& item_list, ostream& out) {
+        out << "Invoice:\n";
+        for (const auto& it : item_list.items) {
+            out << it.name << " "
+                << it.price << " "
+                << it.quantity << endl;
+        }
+        bill_total(item_list, out);
+    }
 };
 
-int main(){
+int main() {
     list my_list;
-    my_list.add(item("Apple", 100, 2));
-    my_list.add(item("Banana", 50, 5));
-    my_list.add(item("Orange", 80, 3));
+
+    ifstream inFile("shoppingbag.txt");
+    if (!inFile.is_open()) {
+        cout << "Could not open input file\n";
+        return 1;
+    }
+
+    my_list.load_from_file(inFile);
+    inFile.close();
 
     billing_system bs;
-    bs.percent_tax = 18; // Setting tax percentage
+    bs.percent_tax = 18;
 
-    fstream myFile;
-    myFile.open("invoice.txt", ios::out);
-    if(myFile.is_open()){
-        bs.invoice(my_list,myFile);    
+    ofstream outFile("invoice.txt");
+    if (!outFile.is_open()) {
+        cout << "Could not open output file\n";
+        return 1;
     }
-    myFile.close();
 
+    bs.invoice(my_list, outFile);
+    outFile.close();
 
     return 0;
 }

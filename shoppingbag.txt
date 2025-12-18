@@ -1,0 +1,3 @@
+Apple 100 2
+Banana 50 43
+Orange 80 3
