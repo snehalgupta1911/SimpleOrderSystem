@@ -5,7 +5,16 @@
 #include <sstream>
 using namespace std;
 
+/**
+In a professional code mostly each class should be inside its own cpp file for better maintainability.
+In this case item, list, billing_system classes should be in their own files. And main method could be a separate file like launcher.cpp.
+ */
 class item {
+
+/**Code review : Srihari
+Why should the class variables be public ? As part of encapsulation you should decide what should be public/private/protected..
+In this case these variables should have been private and accessed through public getter/setter methods if needed.
+**/
 public:
     string name;
     int price;
@@ -16,6 +25,11 @@ public:
 };
 
 class list {
+
+/**Code review : Srihari
+Why should the class variables be public ? As part of encapsulation you should decide what should be public/private/protected..
+In this case these variables should have been private and accessed through public getter/setter methods if needed.
+**/
 public:
     vector<item> items;
 
