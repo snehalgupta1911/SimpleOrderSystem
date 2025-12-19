@@ -1,0 +1,34 @@
+Added some embedded comments in the cpp file from code style perspective (initial) There could be more but refraining from adding those now. Just added the basic things for a maintainability perspective.
+
+I am not at all focusing on algorithms. Those are something you can learn yourselves practicing Leetcode problems.
+I am focusing here on things that don't come there directly this is less liked aspect of writing code that is valued from a maintainability of code perspective. You will realize them as we go for it.
+
+Now lets go through other comments.
+
+My initial problem statement was "Create a Simple Order System that manages item lists, calculates total prices with tax, prints formatted invoices to the console, and saves order logs to a text file."
+
+First set of limitation --
+a) When you start acting on problem statement you should ideally ask questions to reach at exact usecases. Don't start writing code right away.  Applicable to algorithmic problems as well.
+b) Even if you go for assumptions you need to clearly spell those out and validate with the interviewer. This is needed for both interview perspective and in live scenario it ensures that stakeholders' thought is clearly alligns you with them.
+
+Second set of limitation --
+a)Assuming your assumptions are good, you need to plan for certain classes like item, order, shoppingbag, invoice, billing_system and a fileservice to read/write.
+
+This provides abstraction of what all you think to implement.
+Use fileservice to read shopping bag that can contain a number of oreders in it. This is called composition. on shopping bad item can have a unique id to distinguish this from other shopping bags once the order is placed.
+
+Billing_system can use an algorithm to compute the bill and create an invoice object that can be displayed and saved with a shopping bag id. Shopping bag id is the common thing between shooping bag and invoice. Now when you go to RDBMS this is will be primary key in two tables and will also be the foreign key to conenct the tables. This concep more or less remains valid in nosql world.
+
+HAving fileservice separately allows you to maintain that in an isolated manner. This adds modularity to the code.
+If you can design it properly(that's part of next challenge to you to find), you can simple replace the ascii file service to excel file service, or a database service and that too multiple database type support.
+
+The way I used billing service above it is actually asking each stuff to do its own work and reach to result. Basically it just have the algorithm to calculate the bill.
+
+You can then have simpleorderingsystem class that will have your main class to provide service like create orders to save to shoppingbag file, user the orders created in memory or present in shopping bags to create shopping objects which is nothing but a collection of order objects and then it can use billing service to create invoice object for the entire shopping bag and give a unique id for it for future reference. 
+
+Now next challenge can you redesign your program according to above feedback and a challene I threw above to find out a good way so that if I ask you to replace file writing with excel writing that is a minor task and just need you to write an excel read write module.
+
+Along with this assignments take an assignment to read :
+a) UML to represent what all I said above in diagrams
+b) See what you can do to test automatically the codes produced above.
+
